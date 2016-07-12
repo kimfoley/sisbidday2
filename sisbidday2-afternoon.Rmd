@@ -1,0 +1,149 @@
+---
+title: "SISBID Day 2, Afternoon"
+author: "Kim"
+date: "July 12, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(stringr)
+```
+
+
+Subsetting with NAs
+```{r, chunk2}
+x = c(1,4,5,6,NA,7)
+x > 5 # This preserves NA
+
+y <- x %in% c(5,7)
+y
+```
+
+Tables:
+
+Check missingness
+```{r, chunk3}
+table(x, useNA = "ifany")
+#This will add another column with the number of NAs
+unique(x)
+table(x)
+table(x, useNA = "always")
+#This will always include a column for NA even if there aren't any
+
+```
+
+
+
+Tables with factors
+```{r, chunk4}
+fac = factor(c(0, 1, 2, 3, 2, 3, 3, 2,2, 3),
+             levels = 1:4) #0 gets dropped because you did not specify 0 as a level
+tab = table(fac)
+tab
+
+fac1 = factor(c(0, 1, 2, 3, 2, 3, 3, 2,2, 3),
+             levels = 0:4) #0 gets dropped because you did not specify 0 as a level
+tab1 = table(fac1)
+tab1
+```
+
+Create a two way table
+```{r, chunk5}
+tab2 <- table(c(0, 1, 2, 3, 2, 3, 3, 2,2, 3), 
+             c(0, 1, 2, 3, 2, 3, 3, 4, 4, 3), 
+              useNA = "always")
+tab2
+
+tab3 <- table(c(0, 1, 2, 3, 2, 3, 3, 2,2, 3), 
+             c(0, 1, 2, 3, 2, 3, 3, 4, 4, 3), 
+              useNA = "always", dnn = c("First", "Second"))
+tab3 #DNN will add labels to the tables
+```
+
+Recoding to and from missing: is.na
+```{r, chunk6}
+ages = c(23,21,44,32,57,65,-999,54)
+range(ages) # Range will show you the range!
+
+ages[ages == -999] = NA #Recode -999 to missing
+range(ages)
+range(ages,na.rm=TRUE) # Take a look at non-missing
+
+#To missing
+is.na(ages)
+ages[is.na(ages)] = -999
+ages
+```
+
+Download data and take a look: 
+```{r, chunk7}
+Sal = read.csv("../data/Baltimore_City_Employee_Salaries_FY2014.csv",
+               as.is = TRUE)
+str(Sal)
+```
+
+Recode, etc. - see slides and lab?
+
+Paste
+```{r, chunk8}
+paste("Visit", 1:5, sep = "_")
+paste("Visit", 1:5, sep = "_", collapse = " ")
+ #Collapse puts it all into one vector
+paste("To", "is going be the ", "we go to the store!", sep = "day ")
+  #This can be useful for putting a bunch of vars together for regression
+```
+
+Using stringr and regular expressions:
+  RE are ways to search for specific strings
+  http://www.regular-expressions.info/reference.html 
+```{r, chunk9}
+x <- c("I really", "like writing", "R code programs")
+y <- strsplit(x, split = " ") # returns a list
+y
+```
+
+```{r, chunk10}
+mycities <- c("Seattle", "SF","LA", "Chicago")
+y <- strsplit(mycities, split = " ") # returns a list
+y
+
+
+```
+
+sapply in the slides -> applying the function to each part of the list? I still don't understand this.
+
+grep
+```{r,chunk11}
+grep("Rawlings", Sal$Name) #Will find names with Rawling in them
+Sal[grep("Rawlings", Sal$Name),] #return values in base R
+
+Sal %>% filter(str_detect(Name, "Rawlings")) #dplyr
+```
+
+Sub and gsub
+```{r, chunk12}
+
+Sal$AnnualSalary <- as.numeric(gsub(pattern = "$", replacement="", 
+                              Sal$AnnualSalary, fixed=TRUE))
+#gsub takes $, replaces it with nothing in annual salary and need fixed 
+#because $ has a value in regular expressions
+Sal <- Sal[order(Sal$AnnualSalary, decreasing=TRUE), ] 
+Sal[1:5, c("Name", "AnnualSalary", "JobTitle")]
+```
+
+With dplyr
+```{r, chunk13}
+dplyr_sal = Sal
+dplyr_sal = dplyr_sal %>% mutate(   #mutate creates a new column but giving it the same name
+  AnnualSalary = AnnualSalary %>%
+    str_replace(
+      fixed("$"), 
+      "") %>% #Piping
+    as.numeric) %>%
+  arrange(desc(AnnualSalary))
+check_Sal = Sal
+rownames(check_Sal) = NULL
+all.equal(check_Sal, dplyr_sal)
+```
