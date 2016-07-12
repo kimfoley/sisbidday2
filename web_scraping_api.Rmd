@@ -1,0 +1,61 @@
+---
+title: "Web Scraping"
+author: "Kim"
+date: "July 12, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(rvest)
+```
+
+Scrape table - can't go straight there because the table is actually created in javascript
+``` {r, chunk2}
+want_url <- "https://raw.githubusercontent.com/SISBID/Module1/gh-pages/labs/bioc-software.html"
+htmlfile = read_html(want_url) #Downloading HTML code from the internet
+htmlfile
+```
+
+Run rvest
+```{r, chunk3}
+nds = html_nodes(htmlfile,                
+      xpath='//*[@id="biocViews_package_table"]') 
+nds
+```
+
+Make a table
+```{r, chunk4}
+dat = html_table(nds)
+dat = as.data.frame(dat)
+```
+
+Make a word cloud: first paste text and load package
+```{r, chunk5}
+text = paste(dat[,3], collapse=" ") #Smush all th text into one long text string
+library(wordcloud)
+```
+
+Then make the cloud.
+```{r, chunk6}
+wordcloud(text,max.words=50)
+```
+
+
+API
+
+Load package
+```{r, chunk 7}
+library(httr)
+```
+
+Use get function and query for API (see slides)
+```{r, chunk8}
+library(jsonlite)
+oct4_dat = fromJSON("http://rest.ensembl.org//lookup/id/ENSG00000204531?content-type=application/json;expand=1")
+str(oct4_dat)
+```
+
+Look at the other gene
+```{r, chunk9}
+new_gene = fromJSON("http://rest.ensembl.org//lookup/id/ENSG00000141510?content-type=application/json;expand=1")

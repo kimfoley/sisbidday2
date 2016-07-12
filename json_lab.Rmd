@@ -1,0 +1,21 @@
+---
+title: "json_lab"
+author: "Kim"
+date: "July 12, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(jsonlite)
+```
+
+1. Use github API to look at Hadley Wickham's stuff
+```{r, chunk2}
+github_url = "https://api.github.com/users/hadley/repos"
+jsonData <- fromJSON(github_url)
+names(jsonData)
+jsonData$stargazers_count
+```
+
+See key

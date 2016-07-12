@@ -52,3 +52,31 @@ jsonData$owner$html_url
 
 
 Web Scraping
+- How to find stuff: Inspect -> go until the thing you want is highlighted when you scroll over the code -> copy -> copy xpath
+It gives you this: //*[@id="recounttab"]
+Xpath is an identifier in the xpath language for this table
+
+
+Install packages and identify URL
+```{r, chunk6}
+recount_url = "http://bowtie-bio.sourceforge.net/recount/"
+library(rvest)
+htmlfile = read_html(recount_url) #Downloading HTML code from the internet
+htmlfile
+```
+
+Extract element you want and convert into data you can use in a data frame!
+``` {r, chunk 7}
+nds = html_nodes(htmlfile,                
+      xpath='//*[@id="recounttab"]/table') 
+nds
+#Specifying which bit of the html code you want
+```
+
+Then turn it into a data frame and make the first row the column names and save all but the first row in the data frame
+```{r, chunk8}
+dat = html_table(nds)
+dat = as.data.frame(dat)
+names(dat) = dat[1,]
+dat[-1,]
+```
