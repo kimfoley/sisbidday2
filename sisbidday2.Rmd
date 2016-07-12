@@ -27,4 +27,28 @@ head(dat)
 ```
 This isn't working?
 
-Start with Lab:
+
+
+JSON Section:
+Take a look at all of the repos Jeff has on github
+```{r, chunk4}
+library(jsonlite)
+github_url = "https://api.github.com/users/jtleek/repos"
+jsonData <- fromJSON(github_url)
+dim(jsonData)
+jsonData$name
+```
+
+Exploring data frame - there's a data frame inside of a data frame, kind of, called "owner"
+```{r, chunk5}
+table(sapply(jsonData,class))
+dim(jsonData$owner)
+names(jsonData$owner)
+jsonData$owner$html_url
+  #Need to subset twice - first the json data set, then the data frame, then the column
+
+```
+
+
+
+Web Scraping
