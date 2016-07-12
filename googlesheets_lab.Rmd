@@ -1,0 +1,46 @@
+---
+title: "SISBID Googlesheets Lab"
+author: "Kim"
+date: "July 12, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(googlesheets)
+```
+
+2. Open Google spreadsheet
+```{r, chunk2}
+sheets_url = "https://docs.google.com/spreadsheets/d/103vUoftv2dLNZ_FcAz08b5ptIkWN4W2RaFn7VF39FJ8"
+gsurl1 = gs_url(sheets_url)
+dat = gs_read(gsurl1)
+head(dat)
+```
+
+3. Look at arguments for cell_rows, cell_limits, cell_cols
+```{r, chunk 3, include=FALSE}
+?gs_read
+```
+
+4. Read in first two columns
+```{r, chunk4}
+dat_short = gs_read(gsurl1, range=cell_cols(1:2))
+dat_short
+```
+
+5. How many students have added their info?
+```{r chunk5}
+nrow(dat)
+```
+
+6. Logical var for whether students have more than 2 years of R experience
+```{r, chunk 6}
+dat$rexp <- as.numeric(dat$"Years of R experience")
+
+
+```
+
+
+
+
